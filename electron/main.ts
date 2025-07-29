@@ -30,13 +30,16 @@ function createWindow() {
     icon,
     minWidth: 1000,
     minHeight: 600,
-    frame: false,
+    frame: true,
+    titleBarStyle: 'hidden',
     transparent: true,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true
     }
   })
+
+  mainWindow.webContents.openDevTools()
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:4000')
@@ -64,17 +67,31 @@ async function createMenu() {
 
   const template: MenuItemConstructorOptions[] = [
     {
-      label: 'Rocketredis',
+      label: 'PromptMan',
       submenu: [
         {
           label: i18n.t('applicationMenu:newConnection'),
           accelerator: 'CmdOrCtrl+N',
           click: () => {
-            mainWindow?.webContents.send('newConnection')
+            mainWindow?.webContents.send('newPrompt')
           }
         },
         {
           type: 'separator'
+        },
+        {
+          label: 'Executar Prompt Selecionado',
+          accelerator: 'CmdOrCtrl+Enter',
+          click: () => {
+            mainWindow?.webContents.send('runSelectedPrompt')
+          }
+        },
+        {
+          label: 'Salvar Prompt Selecionado',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => {
+            mainWindow?.webContents.send('saveSelectedPrompt')
+          }
         },
         {
           label: i18n.t('applicationMenu:exit'),
@@ -103,7 +120,7 @@ async function createMenu() {
         {
           label: 'Learn More',
           click: () => {
-            shell.openExternal('https://github.com/diego3g/rocketredis/')
+            shell.openExternal('https://github.com/diego3g/promptman/')
           }
         }
       ]

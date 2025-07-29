@@ -49,15 +49,28 @@ const Header: React.FC = () => {
     window.minimize()
   }, [])
 
+  const handleHeaderDoubleClick = useCallback(() => {
+    const window = remote.getCurrentWindow()
+    if (window.isMaximized()) {
+      window.unmaximize()
+    } else {
+      window.maximize()
+    }
+  }, [])
+
   const useMacOSWindowActionButtons = useConfig('useMacOSWindowActionButtons')
 
   const shouldUseMacOSWindowActions = useMemo(() => {
     return useMacOSWindowActionButtons || os.platform() === 'darwin'
   }, [useMacOSWindowActionButtons])
 
+  // Exibe o header customizado apenas se a variável de ambiente REACT_APP_ELECTRON_FRAME for 'false' (ou não definida)
+  const showCustomHeader = false//!process.env.REACT_APP_ELECTRON_FRAME || process.env.REACT_APP_ELECTRON_FRAME === 'false'
+  if (!showCustomHeader) return null 
+
   return (
-    <Container>
-      <strong>Rocket Redis</strong>
+    <Container onDoubleClick={handleHeaderDoubleClick}>
+      <strong>PromptMan</strong>
 
       {shouldUseMacOSWindowActions ? (
         <WindowActions position="left" shouldShowIconsOnHover>

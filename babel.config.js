@@ -13,8 +13,7 @@ module.exports = api => {
         {
           regenerator: true
         }
-      ],
-      !api.env('production') && 'react-refresh/babel'
+      ]
     ].filter(Boolean)
   }
 }

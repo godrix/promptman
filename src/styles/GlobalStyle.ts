@@ -5,14 +5,56 @@ export const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    outline: 0;
+  }
+
+  html, body, #root {
+    height: 100%;
   }
 
   body {
+    background: #191622;
     color: #E1E1E6;
-    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Remover bordas de focus de todos os elementos */
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remover bordas de focus específicas para botões e elementos clicáveis */
+  button:focus,
+  input:focus,
+  textarea:focus,
+  select:focus,
+  a:focus,
+  div[role="button"]:focus,
+  [tabindex]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remover bordas de seleção */
+  *::selection {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Remover bordas de highlight do navegador */
+  *::-moz-focus-inner {
+    border: 0;
+  }
+
+  /* Remover bordas de highlight específicas */
+  *::-webkit-focus-ring-color {
+    outline: none !important;
+  }
+
+
 
   body, input, button {
     font: 400 16px Roboto, sans-serif;

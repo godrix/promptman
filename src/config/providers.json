@@ -1,0 +1,169 @@
+{
+  "providers": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "displayName": "OpenAI",
+      "baseUrl": "https://api.openai.com/v1",
+      "models": [
+        {
+          "id": "gpt-4o",
+          "name": "gpt-4o",
+          "displayName": "GPT-4o",
+          "maxTokens": 128000,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gpt-4o-mini",
+          "name": "gpt-4o-mini",
+          "displayName": "GPT-4o Mini",
+          "maxTokens": 128000,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gpt-4-turbo",
+          "name": "gpt-4-turbo-preview",
+          "displayName": "GPT-4 Turbo",
+          "maxTokens": 128000,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gpt-3.5-turbo",
+          "name": "gpt-3.5-turbo",
+          "displayName": "GPT-3.5 Turbo",
+          "maxTokens": 16385,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096
+        }
+      ],
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {apiKey}"
+      },
+      "requestFormat": {
+        "method": "POST",
+        "endpoint": "/chat/completions",
+        "body": {
+          "model": "{model}",
+          "messages": [
+            {
+              "role": "system",
+              "content": "{systemPrompt}"
+            },
+            {
+              "role": "user",
+              "content": "{userPrompt}"
+            }
+          ],
+          "temperature": "{temperature}",
+          "max_tokens": "{maxTokens}",
+          "top_p": "{topP}",
+          "frequency_penalty": "{frequencyPenalty}",
+          "presence_penalty": "{presencePenalty}",
+          "stop": "{stopSequences}",
+          "seed": "{seed}"
+        }
+      },
+      "responseFormat": {
+        "contentPath": "choices[0].message.content",
+        "usagePath": "usage",
+        "errorPath": "error.message"
+      }
+    },
+    {
+      "id": "gemini",
+      "name": "Gemini",
+      "displayName": "Google Gemini",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "models": [
+        {
+          "id": "gemini-2.5-pro",
+          "name": "gemini-2.5-pro",
+          "displayName": "Gemini 2.5 Pro",
+          "maxTokens": 1048576,
+          "defaultTemperature": 1,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gemini-2.5-flash",
+          "name": "gemini-2.5-flash",
+          "displayName": "Gemini 2.5 Flash",
+          "maxTokens": 1048576,
+          "defaultTemperature": 1,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gemini-2.5-flash-lite",
+          "name": "gemini-2.5-flash-lite",
+          "displayName": "Gemini 2.5 Flash Lite",
+          "maxTokens": 1048576,
+          "defaultTemperature": 1,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gemini-2.0-flash",
+          "name": "gemini-2.0-flash",
+          "displayName": "Gemini 2.0 Flash",
+          "maxTokens": 1048576,
+          "defaultTemperature": 1,
+          "defaultMaxTokens": 4096
+        },
+        {
+          "id": "gemini-2.0-flash-lite",
+          "name": "gemini-2.0-flash-lite",
+          "displayName": "Gemini 2.0 Flash Lite",
+          "maxTokens": 1048576,
+          "defaultTemperature": 1,
+          "defaultMaxTokens": 4096
+        }
+      ],
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "requestFormat": {
+        "method": "POST",
+        "endpoint": "/models/{model}:generateContent?key={apiKey}",
+        "body": {
+          "contents": [
+            {
+              "role": "user",
+              "parts": [
+                {
+                  "text": "{fullPrompt}"
+                }
+              ]
+            }
+          ],
+          "generationConfig": {
+            "temperature": "{temperature}",
+            "maxOutputTokens": "{maxTokens}",
+            "topP": "{topP}",
+            "topK": "{topK}",
+            "stopSequences": "{stopSequences}",
+            "candidateCount": 1
+          }
+        }
+      },
+      "responseFormat": {
+        "contentPath": "candidates[0].content.parts[0].text",
+        "usagePath": "usageMetadata",
+        "errorPath": "error.message"
+      }
+    }
+  ],
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-4o",
+  "defaultSettings": {
+    "temperature": 0.7,
+    "maxTokens": 4096,
+    "topP": 1,
+    "frequencyPenalty": 0,
+    "presencePenalty": 0,
+    "topK": 1,
+    "stopSequences": [],
+    "seed": null
+  }
+} 

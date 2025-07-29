@@ -4,5 +4,37 @@
   },
   "newConnection": {
 
+  },
+  "promptEditor": {
+    "welcome": "Welcome to PromptMan",
+    "selectPrompt": "Select a prompt from the list to start editing and testing your AI instructions",
+    "clickToAdd": "Click the \"+\" button to create a new prompt",
+    "saved": "Saved",
+    "run": "Run",
+    "variables": "Variables",
+    "modelSettings": "Model Settings",
+    "save": "Save",
+    "assistant": "Assistant",
+    "user": "User",
+    "assistantResponsePlaceholder": "Assistant response...",
+    "userMessagePlaceholder": "User message...",
+    "response": "Response",
+    "copied": "Copied!",
+    "responseCopied": "Response copied to clipboard.",
+    "systemPromptLabel": "System Prompt",
+    "systemPromptPlaceholder": "Define a role, tone or context (optional)",
+    "optional": "(optional)",
+    "templalize": "Templalize",
+    "templalizeModalTitle": "Templalized Prompt",
+    "templalizing": "Templalizing prompt...",
+    "noTemplalizedPrompt": "No templalized prompt available",
+    "copyTemplalized": "Copy Templalized",
+    "templalizeErrorTitle": "Templalize Error",
+    "templalizeCopiedTitle": "Copied!",
+    "templalizeCopiedDescription": "Templalized prompt copied to clipboard",
+    "copyErrorTitle": "Copy Error",
+    "copyErrorDescription": "Failed to copy to clipboard",
+    "runTemplalized": "Run Templalized",
+    "close": "Close"
   }
 }

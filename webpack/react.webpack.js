@@ -1,6 +1,5 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 
 const rootPath = path.resolve(__dirname, '..')
 
@@ -43,6 +42,5 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(rootPath, 'index.html')
     }),
-    isDevelopment && new ReactRefreshWebpackPlugin(),
   ].filter(Boolean),
 }

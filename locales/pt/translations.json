@@ -1,0 +1,40 @@
+{
+  "connectionList": {
+    "title": "CONEXÕES"
+  },
+  "newConnection": {
+
+  },
+  "promptEditor": {
+    "welcome": "Bem-vindo ao PromptMan",
+    "selectPrompt": "Selecione um prompt da lista ao lado para começar a editar e testar suas instruções de IA",
+    "clickToAdd": "Clique no botão \"+\" para criar um novo prompt",
+    "saved": "Salvo",
+    "run": "Executar",
+    "variables": "Variáveis",
+    "modelSettings": "Configurações do Modelo",
+    "save": "Salvar",
+    "assistant": "Assistente",
+    "user": "Usuário",
+    "assistantResponsePlaceholder": "Resposta do assistente...",
+    "userMessagePlaceholder": "Mensagem do usuário...",
+    "response": "Resposta",
+    "copied": "Copiado!",
+    "responseCopied": "Resposta copiada para a área de transferência.",
+    "systemPromptLabel": "Prompt do Sistema",
+    "systemPromptPlaceholder": "Defina um papel, tom ou contexto (opcional)",
+    "optional": "(opcional)",
+    "templalize": "Templalizar",
+    "templalizeModalTitle": "Prompt Templarizado",
+    "templalizing": "Templarizando prompt...",
+    "noTemplalizedPrompt": "Nenhum prompt templarizado disponível",
+    "copyTemplalized": "Copiar Templarizado",
+    "templalizeErrorTitle": "Erro ao Templarizar",
+    "templalizeCopiedTitle": "Copiado!",
+    "templalizeCopiedDescription": "Prompt templarizado copiado para a área de transferência",
+    "copyErrorTitle": "Erro ao Copiar",
+    "copyErrorDescription": "Falha ao copiar para a área de transferência",
+    "runTemplalized": "Executar Templarizado",
+    "close": "Fechar"
+  }
+}

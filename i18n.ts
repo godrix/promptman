@@ -8,7 +8,7 @@ const options = {
   lng: 'en',
   fallbackLng: 'en',
   debug: true,
-  whitelist: ['en'],
+  whitelist: ['en', 'pt'],
   backend: {
     loadPath: './locales/{{lng}}/{{ns}}.json',
     addPath: './locales/{{lng}}/{{ns}}.missing.json'

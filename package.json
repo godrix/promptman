@@ -1,22 +1,26 @@
 {
-  "name": "rocketredis",
-  "version": "1.0.0",
-  "description": "A beautiful Redis GUI.",
+  "name": "promptman",
+  "version": "0.0.1",
+  "description": "A beautiful Prompt Testing and Management Tool.",
   "keywords": [],
   "license": "MIT",
-  "author": "Diego Fernandes <diego.schell.f@gmail.com>",
+  "author": "Carlos Gabriel Godri <eu@godri.me>",
   "main": "./dist/main.js",
   "scripts": {
     "build": "rimraf dist && npm-run-all -p build:*",
-    "build:electron": "cross-env NODE_ENV=production webpack --config webpack/electron.webpack.js",
-    "build:react": "cross-env NODE_ENV=production webpack --config webpack/react.webpack.js",
+    "build:electron": "cross-env NODE_ENV=production NODE_OPTIONS='--openssl-legacy-provider' webpack --config webpack/electron.webpack.js",
+    "build:react": "cross-env NODE_ENV=production NODE_OPTIONS='--openssl-legacy-provider' webpack --config webpack/react.webpack.js",
     "dev": "npm-run-all -p dev:react electron:serve",
-    "dev:electron": "cross-env NODE_ENV=development webpack --config webpack/electron.webpack.js && electron .",
-    "dev:react": "cross-env NODE_ENV=development webpack-dev-server --config webpack/react.webpack.js",
+    "dev:electron": "cross-env NODE_ENV=development NODE_OPTIONS='--openssl-legacy-provider' webpack --config webpack/electron.webpack.js && electron .",
+    "dev:react": "cross-env NODE_ENV=development NODE_OPTIONS='--openssl-legacy-provider' webpack-dev-server --config webpack/react.webpack.js",
     "electron:serve": "wait-on http-get://localhost:4000/ && npm run dev:electron",
     "postinstall": "electron-builder install-app-deps",
     "lint": "eslint --ext .tsx,.ts,.js src/ electron/",
     "package": "yarn build && electron-builder build --publish never",
+    "package:linux": "yarn build && electron-builder build --linux --publish never",
+    "package:mac": "yarn build && electron-builder build --mac --publish never",
+    "package:windows": "yarn build && electron-builder build --win --publish never",
+    "package:all": "yarn build && electron-builder build -mwl --publish never",
     "test": "jest --passWithNoTests",
     "tsc": "tsc --noEmit"
   },
@@ -49,7 +53,6 @@
     "i18next": "19.6.3",
     "i18next-electron-language-detector": "0.0.10",
     "i18next-fs-backend": "1.0.7",
-    "ioredis": "4.17.3",
     "npm-run-all": "4.1.5",
     "polished": "3.6.5",
     "react": "16.13.1",
@@ -79,7 +82,6 @@
     "@commitlint/core": "9.1.2",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.1",
     "@testing-library/react": "10.4.9",
-    "@types/ioredis": "4.17.2",
     "@types/jest": "26.0.7",
     "@types/node": "12.19.12",
     "@types/react": "16.9.41",
@@ -117,6 +119,7 @@
     "react-refresh": "0.8.3",
     "rimraf": "3.0.2",
     "sort-package-json": "1.44.0",
+    "source-map": "0.7.6",
     "ts-jest": "26.4.4",
     "typescript": "3.9.7",
     "webpack": "4.44.0",
@@ -124,22 +127,52 @@
     "webpack-dev-server": "3.11.0"
   },
   "build": {
-    "appId": "com.diego3g.rocketredis",
-    "productName": "Rocket Redis",
+    "appId": "com.promptman.app",
+    "productName": "PromptMan",
+    "copyright": "Copyright © 2024 Carlos Gabriel Godri",
+    "compression": "maximum",
     "files": [
       "dist/"
     ],
     "win": {
       "target": [
-        "portable"
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
       ]
     },
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ]
     },
     "linux": {
       "target": [
-        "AppImage"
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["x64"]
+        }
       ],
       "category": "Development"
     },

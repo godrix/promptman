@@ -1,0 +1,56 @@
+{
+  "app": {
+    "name": "PromptMan",
+    "version": "1.0.0",
+    "description": "A beautiful Prompt Testing and Management Tool",
+    "author": "Diego Fernandes",
+    "repository": "https://github.com/diego3g/promptman"
+  },
+  "ui": {
+    "theme": {
+      "default": "dark",
+      "available": ["dark", "light"]
+    },
+    "language": {
+      "default": "pt",
+      "available": ["pt", "en"]
+    },
+    "window": {
+      "defaultWidth": 1200,
+      "defaultHeight": 800,
+      "minWidth": 800,
+      "minHeight": 600
+    }
+  },
+  "features": {
+    "templalize": {
+      "enabled": true,
+      "defaultSystemPrompt": "Você é um especialista em análise e estruturação de prompts para IA. Sua tarefa é analisar o prompt fornecido e criar uma versão templarizada em formato XML, separando claramente os diferentes componentes do prompt."
+    },
+    "variables": {
+      "enabled": true,
+      "pattern": "\\{\\{([^}]+)\\}\\}",
+      "autoDetect": true
+    },
+    "tokenCounting": {
+      "enabled": true,
+      "warningThreshold": 0.8
+    },
+    "autoSave": {
+      "enabled": true,
+      "interval": 30000
+    }
+  },
+  "shortcuts": {
+    "save": "Ctrl+S",
+    "run": "Ctrl+Enter",
+    "newPrompt": "Ctrl+N",
+    "openSettings": "Ctrl+,",
+    "templalize": "Ctrl+T"
+  },
+  "storage": {
+    "prompts": "prompts.json",
+    "settings": "settings.json",
+    "history": "history.json"
+  }
+} 

@@ -1,5 +1,8 @@
 import Store from 'electron-store'
 import { JSONSchemaType } from 'json-schema-typed'
+import { getUIConfig } from '../config'
+
+const uiConfig = getUIConfig()
 
 const schema = {
   useMacOSWindowActionButtons: {
@@ -9,10 +12,10 @@ const schema = {
   windowBounds: {
     type: JSONSchemaType.Object,
     default: {
-      width: 1100,
-      minWidth: 1000,
-      minHeight: 600,
-      height: 700
+      width: uiConfig.window.defaultWidth,
+      minWidth: uiConfig.window.minWidth,
+      minHeight: uiConfig.window.minHeight,
+      height: uiConfig.window.defaultHeight
     }
   }
 }
