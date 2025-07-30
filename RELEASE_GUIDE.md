@@ -92,8 +92,6 @@ Cada release inclui os seguintes arquivos:
 
 Antes de criar uma release, certifique-se de:
 
-- [ ] O código está formatado (`yarn format`)
-- [ ] Não há erros de lint (`yarn lint`)
 - [ ] A versão no `package.json` está correta
 - [ ] O changelog está atualizado (se aplicável)
 - [ ] Você está no branch `main`

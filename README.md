@@ -169,7 +169,6 @@ yarn package          # Creates executable for current platform
 yarn package:all      # Creates executables for all platforms
 
 # Code Quality
-yarn lint             # Runs ESLint
 yarn format           # Formats code with Prettier
 
 # Specific Builds
@@ -240,7 +239,6 @@ PromptMan is an open-source project and welcomes contributions from the communit
 
 ### Guidelines
 
-- Follow established code standards
 - Keep documentation updated
 - Use semantic commits
 
