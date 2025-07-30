@@ -197,7 +197,6 @@
       "category": "Development"
     },
     "directories": {
-      "buildResources": "build",
       "output": "release"
     }
   }
