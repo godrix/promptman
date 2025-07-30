@@ -1,0 +1,34 @@
+name: Notify
+
+on:
+  workflow_run:
+    workflows: ['Release', 'CI']
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion != 'skipped' }}
+
+    steps:
+      - name: Notify on failure
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        run: |
+          echo "❌ Workflow ${{ github.event.workflow_run.name }} failed!"
+          echo "Check the run at: ${{ github.event.workflow_run.html_url }}"
+
+      - name: Notify on success
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
+        run: |
+          echo "✅ Workflow ${{ github.event.workflow_run.name }} completed successfully!"
+          echo "View results at: ${{ github.event.workflow_run.html_url }}"
+      # You can add Slack, Discord, or other notification services here
+      # Example for Slack:
+      # - name: Notify Slack
+      #   if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+      #   uses: 8398a7/action-slack@v3
+      #   with:
+      #     status: ${{ github.event.workflow_run.conclusion }}
+      #     channel: '#promptman-dev'
+      #     webhook_url: ${{ secrets.SLACK_WEBHOOK }}

@@ -1,0 +1,42 @@
+name: Nightly Build
+
+on:
+  schedule:
+    # Executar todos os dias às 2:00 UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  nightly-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build for all platforms
+        run: yarn package:all
+        env:
+          NODE_ENV: production
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-builds-${{ github.sha }}
+          path: |
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+          retention-days: 7

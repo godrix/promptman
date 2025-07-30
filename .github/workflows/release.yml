@@ -1,0 +1,306 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'V*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Clean previous builds
+        run: |
+          echo "🧹 Cleaning previous builds..."
+          rm -rf dist/
+          rm -rf release/
+          mkdir -p release/
+
+      - name: Build for Windows
+        run: yarn package:windows
+        env:
+          NODE_ENV: production
+
+      - name: Build for macOS
+        run: yarn package:mac
+        env:
+          NODE_ENV: production
+
+      - name: Build for Linux
+        run: yarn package:linux
+        env:
+          NODE_ENV: production
+
+      - name: Validate build artifacts
+        run: |
+          echo "🔍 Validating build artifacts..."
+
+          # Check if Windows artifacts exist
+          if [ -f "./release/PromptMan Setup ${{ github.ref_name }}.exe" ]; then
+            echo "✅ Windows Setup found"
+          else
+            echo "❌ Windows Setup not found"
+            exit 1
+          fi
+
+          if [ -f "./release/PromptMan ${{ github.ref_name }}.exe" ]; then
+            echo "✅ Windows Portable found"
+          else
+            echo "❌ Windows Portable not found"
+            exit 1
+          fi
+
+          # Check if macOS artifacts exist
+          if [ -f "./release/PromptMan ${{ github.ref_name }}.dmg" ]; then
+            echo "✅ macOS DMG found"
+          else
+            echo "❌ macOS DMG not found"
+            exit 1
+          fi
+
+          if [ -f "./release/PromptMan ${{ github.ref_name }}-mac.zip" ]; then
+            echo "✅ macOS ZIP found"
+          else
+            echo "❌ macOS ZIP not found"
+            exit 1
+          fi
+
+          # Check if Linux artifacts exist
+          if [ -f "./release/PromptMan ${{ github.ref_name }}.AppImage" ]; then
+            echo "✅ Linux AppImage found"
+          else
+            echo "❌ Linux AppImage not found"
+            exit 1
+          fi
+
+          if [ -f "./release/promptman_${{ github.ref_name }}_amd64.deb" ]; then
+            echo "✅ Linux DEB found"
+          else
+            echo "❌ Linux DEB not found"
+            exit 1
+          fi
+
+          if [ -f "./release/promptman-${{ github.ref_name }}.x86_64.rpm" ]; then
+            echo "✅ Linux RPM found"
+          else
+            echo "❌ Linux RPM not found"
+            exit 1
+          fi
+
+          echo "🎉 All artifacts validated successfully!"
+
+      - name: Check file sizes
+        run: |
+          echo "📏 Checking file sizes..."
+
+          echo "Windows artifacts:"
+          ls -lh "./release/PromptMan Setup ${{ github.ref_name }}.exe"
+          ls -lh "./release/PromptMan ${{ github.ref_name }}.exe"
+
+          echo "macOS artifacts:"
+          ls -lh "./release/PromptMan ${{ github.ref_name }}.dmg"
+          ls -lh "./release/PromptMan ${{ github.ref_name }}-mac.zip"
+
+          echo "Linux artifacts:"
+          ls -lh "./release/PromptMan ${{ github.ref_name }}.AppImage"
+          ls -lh "./release/promptman_${{ github.ref_name }}_amd64.deb"
+          ls -lh "./release/promptman-${{ github.ref_name }}.x86_64.rpm"
+
+      - name: Generate checksums
+        run: |
+          echo "🔐 Generating checksums..."
+          cd release/
+
+          # Generate SHA256 checksums for all files
+          find . -name "*.exe" -o -name "*.dmg" -o -name "*.zip" -o -name "*.AppImage" -o -name "*.deb" -o -name "*.rpm" | while read file; do
+            sha256sum "$file" >> checksums.txt
+          done
+
+          echo "📋 Checksums generated:"
+          cat checksums.txt
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            ## 🚀 Nova versão do PromptMan
+
+            **Versão:** ${{ github.ref_name }}
+            **Build ID:** ${{ github.run_id }}
+            **Commit:** ${{ github.sha }}
+            **Data:** ${{ github.event.head_commit.timestamp }}
+
+            ### 📦 Downloads disponíveis:
+
+            **Windows:**
+            - PromptMan Setup (.exe) - Instalador para Windows
+            - PromptMan Portable (.exe) - Versão portátil
+
+            **macOS:**
+            - PromptMan (.dmg) - Instalador para macOS
+            - PromptMan (.zip) - Versão compactada
+
+            **Linux:**
+            - PromptMan (.AppImage) - Executável universal
+            - PromptMan (.deb) - Pacote Debian/Ubuntu
+            - PromptMan (.rpm) - Pacote Red Hat/Fedora
+
+            ### 🔧 Melhorias nesta versão:
+            - Builds otimizados para todas as plataformas
+            - Melhor performance e estabilidade
+            - Validação automática de artefatos
+
+            ### 📋 Instruções de instalação:
+            1. Baixe o arquivo apropriado para seu sistema operacional
+            2. Execute o instalador ou extraia o arquivo
+            3. Execute o PromptMan
+
+            ### 🐛 Reporte bugs:
+            Se encontrar algum problema, por favor abra uma issue no GitHub.
+
+            ### 📊 Build Info:
+            - **Node.js:** 18.x
+            - **Electron:** 11.1.0
+            - **React:** 16.13.1
+            - **Build Time:** ${{ github.event.head_commit.timestamp }}
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/PromptMan Setup ${{ github.ref_name }}.exe
+          asset_name: PromptMan-Setup-${{ github.ref_name }}-Windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows Portable
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/PromptMan ${{ github.ref_name }}.exe
+          asset_name: PromptMan-Portable-${{ github.ref_name }}-Windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS DMG
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/PromptMan ${{ github.ref_name }}.dmg
+          asset_name: PromptMan-${{ github.ref_name }}-macOS.dmg
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/PromptMan ${{ github.ref_name }}-mac.zip
+          asset_name: PromptMan-${{ github.ref_name }}-macOS.zip
+          asset_content_type: application/zip
+
+      - name: Upload Linux AppImage
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/PromptMan ${{ github.ref_name }}.AppImage
+          asset_name: PromptMan-${{ github.ref_name }}-Linux.AppImage
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux DEB
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/promptman_${{ github.ref_name }}_amd64.deb
+          asset_name: PromptMan-${{ github.ref_name }}-Linux.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Upload Linux RPM
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/promptman-${{ github.ref_name }}.x86_64.rpm
+          asset_name: PromptMan-${{ github.ref_name }}-Linux.rpm
+          asset_content_type: application/x-rpm
+
+      - name: Upload checksums
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./release/checksums.txt
+          asset_name: PromptMan-${{ github.ref_name }}-checksums.txt
+          asset_content_type: text/plain
+
+      - name: Notify success
+        run: |
+          echo "🎉 Release ${{ github.ref_name }} created successfully!"
+          echo "📦 All artifacts uploaded to GitHub Releases"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref }}"
+          echo "📊 Build completed in ${{ github.run_duration }} seconds"
+
+      - name: Verify release
+        run: |
+          echo "🔍 Verifying release..."
+
+          # Check if release was created
+          if [ -n "${{ steps.create_release.outputs.upload_url }}" ]; then
+            echo "✅ Release created successfully"
+          else
+            echo "❌ Failed to create release"
+            exit 1
+          fi
+
+          # Check if all artifacts were uploaded
+          echo "📋 Release artifacts:"
+          echo "- Windows Setup: PromptMan-Setup-${{ github.ref_name }}-Windows.exe"
+          echo "- Windows Portable: PromptMan-Portable-${{ github.ref_name }}-Windows.exe"
+          echo "- macOS DMG: PromptMan-${{ github.ref_name }}-macOS.dmg"
+          echo "- macOS ZIP: PromptMan-${{ github.ref_name }}-macOS.zip"
+          echo "- Linux AppImage: PromptMan-${{ github.ref_name }}-Linux.AppImage"
+          echo "- Linux DEB: PromptMan-${{ github.ref_name }}-Linux.deb"
+          echo "- Linux RPM: PromptMan-${{ github.ref_name }}-Linux.rpm"
+          echo "- Checksums: PromptMan-${{ github.ref_name }}-checksums.txt"

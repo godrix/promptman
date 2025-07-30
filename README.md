@@ -171,13 +171,32 @@ yarn package:all      # Creates executables for all platforms
 # Code Quality
 yarn lint             # Runs ESLint
 yarn format           # Formats code with Prettier
-yarn test             # Runs tests
 
 # Specific Builds
 yarn package:mac      # Build for macOS
 yarn package:windows  # Build for Windows
 yarn package:linux    # Build for Linux
+
+# Releases
+yarn release          # Create a new release (see RELEASE_GUIDE.md)
 ```
+
+## 🚀 Releases
+
+PromptMan uses automated releases with GitHub Actions. When you create a tag in the format `V{version}` (e.g., `V1.0.0`), it automatically:
+
+- ✅ Builds for Windows, macOS, and Linux
+- ✅ Creates a GitHub release with all artifacts
+- ✅ Provides downloadable executables for all platforms
+
+### Quick Release
+
+```bash
+# Create a new release
+yarn release 1.0.0
+```
+
+For detailed instructions, see [RELEASE_GUIDE.md](RELEASE_GUIDE.md).
 
 ## 🏗️ Architecture
 
@@ -187,7 +206,6 @@ yarn package:linux    # Build for Linux
 - **Desktop**: Electron 11.1.0
 - **State**: Recoil
 - **Build**: Webpack 4.44.0
-- **Testing**: Jest
 
 ### Project Structure
 
@@ -223,7 +241,6 @@ PromptMan is an open-source project and welcomes contributions from the communit
 ### Guidelines
 
 - Follow established code standards
-- Add tests for new features
 - Keep documentation updated
 - Use semantic commits
 
