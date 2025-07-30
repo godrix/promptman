@@ -104,7 +104,10 @@ export const getProvider = (id: string): Provider | undefined => {
   return providers.find(provider => provider.id === id)
 }
 
-export const getModel = (providerId: string, modelId: string): Model | undefined => {
+export const getModel = (
+  providerId: string,
+  modelId: string
+): Model | undefined => {
   const provider = getProvider(providerId)
   return provider?.models.find(model => model.id === modelId)
 }
@@ -119,15 +122,17 @@ export const getDefaultModel = (): Model => {
 }
 
 // Função para obter o modelo padrão de um provider específico
-export const getDefaultModelForProvider = (providerId: string): Model | undefined => {
+export const getDefaultModelForProvider = (
+  providerId: string
+): Model | undefined => {
   const provider = getProvider(providerId)
   if (!provider) return undefined
-  
+
   // Se o provider tem o modelo padrão configurado, usar ele
   if (providerId === defaultProvider) {
     return getModel(providerId, defaultModel) || provider.models[0]
   }
-  
+
   // Caso contrário, usar o primeiro modelo disponível
   return provider.models[0]
 }
@@ -137,4 +142,4 @@ export const getAppConfig = () => app
 export const getUIConfig = () => app.ui
 export const getFeaturesConfig = () => app.features
 export const getShortcutsConfig = () => app.shortcuts
-export const getStorageConfig = () => app.storage 
+export const getStorageConfig = () => app.storage

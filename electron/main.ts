@@ -4,17 +4,20 @@ import {
   nativeImage,
   Menu,
   shell,
-  MenuItemConstructorOptions
+  MenuItemConstructorOptions,
+  ipcMain
 } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import * as path from 'path'
 import * as url from 'url'
 
-import i18n from '../i18n'
 import {
   getWindowBounds,
   setWindowBounds
 } from '../src/utils/windowBoundsController'
+
+// Importar o serviço de configuração
+import { configService } from '../src/services/configService'
 
 let mainWindow: Electron.BrowserWindow | null
 
@@ -30,8 +33,8 @@ function createWindow() {
     icon,
     minWidth: 1000,
     minHeight: 600,
-    frame: true,
-    titleBarStyle: 'hidden',
+    frame: false,
+
     transparent: true,
     webPreferences: {
       nodeIntegration: true,
@@ -39,7 +42,7 @@ function createWindow() {
     }
   })
 
-  mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools()
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL('http://localhost:4000')
@@ -63,14 +66,12 @@ function createWindow() {
 }
 
 async function createMenu() {
-  await i18n.loadNamespaces('applicationMenu')
-
   const template: MenuItemConstructorOptions[] = [
     {
       label: 'PromptMan',
       submenu: [
         {
-          label: i18n.t('applicationMenu:newConnection'),
+          label: 'New Connection',
           accelerator: 'CmdOrCtrl+N',
           click: () => {
             mainWindow?.webContents.send('newPrompt')
@@ -94,10 +95,24 @@ async function createMenu() {
           }
         },
         {
-          label: i18n.t('applicationMenu:exit'),
+          label: 'Exit',
           role: 'quit',
           accelerator: 'CmdOrCtrl+Q'
         }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'delete' },
+        { type: 'separator' },
+        { role: 'selectAll' }
       ]
     },
     {
@@ -135,6 +150,33 @@ app.on('ready', () => {
   createWindow()
   autoUpdater.checkForUpdatesAndNotify()
   createMenu()
+
+  // Configurar handlers IPC para o serviço de configuração
+  setupConfigHandlers()
 })
+
+// Configurar handlers IPC para o serviço de configuração
+function setupConfigHandlers() {
+  // Handler para ler a configuração dos providers
+  ipcMain.handle('read-providers-config', async () => {
+    try {
+      return await configService.readProvidersConfig()
+    } catch (error) {
+      console.error('Erro ao ler providers config:', error)
+      throw error
+    }
+  })
+
+  // Handler para escrever a configuração dos providers
+  ipcMain.handle('write-providers-config', async (event, config) => {
+    try {
+      await configService.writeProvidersConfig(config)
+      return { success: true }
+    } catch (error) {
+      console.error('Erro ao escrever providers config:', error)
+      throw error
+    }
+  })
+}
 
 app.allowRendererProcessReuse = true

@@ -10,8 +10,6 @@ import Screen from './screen'
 import { GlobalStyle } from './styles/GlobalStyle'
 import { defaultTheme } from './styles/theme'
 
-import '../i18n'
-
 Modal.setAppElement('#root')
 
 const App = () => {

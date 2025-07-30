@@ -2,16 +2,16 @@ import { AIProvider, AIRequestParams, AIRequest, AIResponse } from '../types'
 
 const buildGeminiRequest = (params: AIRequestParams): AIRequest => {
   const { prompt, systemPrompt, model, temperature, maxTokens, apiKey } = params
-  
+
   // Construir o conteúdo da mensagem
   const contents = []
-  
+
   // Para o Gemini, vamos combinar system prompt e user prompt
   let fullPrompt = prompt
   if (systemPrompt) {
     fullPrompt = `${systemPrompt}\n\n${prompt}`
   }
-  
+
   contents.push({
     role: 'user',
     parts: [{ text: fullPrompt }]
@@ -21,7 +21,7 @@ const buildGeminiRequest = (params: AIRequestParams): AIRequest => {
     url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     body: {
       contents,
@@ -54,11 +54,13 @@ const parseGeminiResponse = (response: any): AIResponse => {
   }
 
   const content = candidates.content?.parts?.[0]?.text || ''
-  const usage = response.usageMetadata ? {
-    promptTokens: response.usageMetadata.promptTokenCount || 0,
-    completionTokens: response.usageMetadata.candidatesTokenCount || 0,
-    totalTokens: response.usageMetadata.totalTokenCount || 0
-  } : undefined
+  const usage = response.usageMetadata
+    ? {
+        promptTokens: response.usageMetadata.promptTokenCount || 0,
+        completionTokens: response.usageMetadata.candidatesTokenCount || 0,
+        totalTokens: response.usageMetadata.totalTokenCount || 0
+      }
+    : undefined
 
   return {
     content,
@@ -69,14 +71,16 @@ const parseGeminiResponse = (response: any): AIResponse => {
 // Função para listar modelos disponíveis
 export const listGeminiModels = async (apiKey: string): Promise<string[]> => {
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`)
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+    )
     const data = await response.json()
-    
+
     if (data.error) {
       console.error('Erro ao listar modelos:', data.error)
       return []
     }
-    
+
     return data.models?.map((model: any) => model.name) || []
   } catch (error) {
     console.error('Erro ao listar modelos Gemini:', error)
@@ -110,9 +114,9 @@ export const geminiProvider: AIProvider = {
   config: {
     baseUrl: `https://generativelanguage.googleapis.com/v1beta/models`,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     },
     requestBuilder: buildGeminiRequest,
     responseParser: parseGeminiResponse
   }
-} 
+}

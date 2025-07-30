@@ -14,7 +14,7 @@ export const estimateTokenCount = (text: string): number => {
 
   // Remove espaços extras e quebras de linha
   const cleanText = text.trim()
-  
+
   // Divide o texto em tokens aproximados
   const tokens = cleanText
     .split(/\s+/)
@@ -33,13 +33,16 @@ export const estimateTokenCount = (text: string): number => {
 }
 
 // Função para contar tokens em um prompt completo (system + user)
-export const countPromptTokens = (systemPrompt: string, userPrompt: string): number => {
+export const countPromptTokens = (
+  systemPrompt: string,
+  userPrompt: string
+): number => {
   const systemTokens = estimateTokenCount(systemPrompt)
   const userTokens = estimateTokenCount(userPrompt)
-  
+
   // Adiciona um pequeno overhead para formatação
   const overhead = systemPrompt && userPrompt ? 10 : 0
-  
+
   return systemTokens + userTokens + overhead
 }
 
@@ -48,4 +51,4 @@ export const formatTokenCount = (count: number): string => {
   if (count === 0) return '0 tokens'
   if (count === 1) return '1 token'
   return `${count} tokens`
-} 
+}

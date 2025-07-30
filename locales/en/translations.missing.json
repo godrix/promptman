@@ -1,6 +1,0 @@
-{
-  "promptEditor": {
-    "templalize": "promptEditor.templalize",
-    "runTemplalized": "promptEditor.runTemplalized"
-  }
-}

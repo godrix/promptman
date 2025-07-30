@@ -2,16 +2,16 @@ import { AIProvider, AIRequestParams, AIRequest, AIResponse } from '../types'
 
 const buildOpenAIRequest = (params: AIRequestParams): AIRequest => {
   const { prompt, systemPrompt, model, temperature, maxTokens, apiKey } = params
-  
+
   const messages = []
-  
+
   if (systemPrompt) {
     messages.push({
       role: 'system',
       content: systemPrompt
     })
   }
-  
+
   messages.push({
     role: 'user',
     content: prompt
@@ -22,7 +22,7 @@ const buildOpenAIRequest = (params: AIRequestParams): AIRequest => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
+      Authorization: `Bearer ${apiKey}`
     },
     body: {
       model,
@@ -50,11 +50,13 @@ const parseOpenAIResponse = (response: any): AIResponse => {
     }
   }
   const content = choice.message?.content || ''
-  const usage = response.usage ? {
-    promptTokens: response.usage.prompt_tokens || 0,
-    completionTokens: response.usage.completion_tokens || 0,
-    totalTokens: response.usage.total_tokens || 0
-  } : undefined
+  const usage = response.usage
+    ? {
+        promptTokens: response.usage.prompt_tokens || 0,
+        completionTokens: response.usage.completion_tokens || 0,
+        totalTokens: response.usage.total_tokens || 0
+      }
+    : undefined
   return {
     content,
     usage,
@@ -93,4 +95,4 @@ export const openaiProvider: AIProvider = {
     requestBuilder: buildOpenAIRequest,
     responseParser: parseOpenAIResponse
   }
-} 
+}

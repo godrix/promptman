@@ -65,8 +65,8 @@ const Header: React.FC = () => {
   }, [useMacOSWindowActionButtons])
 
   // Exibe o header customizado apenas se a variável de ambiente REACT_APP_ELECTRON_FRAME for 'false' (ou não definida)
-  const showCustomHeader = false//!process.env.REACT_APP_ELECTRON_FRAME || process.env.REACT_APP_ELECTRON_FRAME === 'false'
-  if (!showCustomHeader) return null 
+  const showCustomHeader = true // !process.env.REACT_APP_ELECTRON_FRAME || process.env.REACT_APP_ELECTRON_FRAME === 'false'
+  if (!showCustomHeader) return null
 
   return (
     <Container onDoubleClick={handleHeaderDoubleClick}>

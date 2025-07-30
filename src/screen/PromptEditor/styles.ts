@@ -74,15 +74,15 @@ export const Content = styled.div`
   display: flex;
   padding: 20px;
   gap: 20px;
+  min-height: 0;
 `
 
 export const EditorSection = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 `
-
-
 
 export const ConfigSection = styled.div`
   margin-bottom: 16px;
@@ -92,12 +92,12 @@ export const ConfigSection = styled.div`
 
 export const VariablesButton = styled.button<{ isActive?: boolean }>`
   padding: 8px 12px;
-  background: ${({ theme, isActive }) => 
+  background: ${({ theme, isActive }) =>
     isActive ? theme.colors.purple : theme.backgrounds.lighter};
-  color: ${({ theme, isActive }) => 
-    isActive ? 'white' : theme.colors.white};
-  border: 1px solid ${({ theme, isActive }) => 
-    isActive ? theme.colors.purple : theme.backgrounds.lightest};
+  color: ${({ theme, isActive }) => (isActive ? 'white' : theme.colors.white)};
+  border: 1px solid
+    ${({ theme, isActive }) =>
+      isActive ? theme.colors.purple : theme.backgrounds.lightest};
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -109,19 +109,19 @@ export const VariablesButton = styled.button<{ isActive?: boolean }>`
   position: relative;
 
   &:hover {
-    background: ${({ theme, isActive }) => 
+    background: ${({ theme, isActive }) =>
       isActive ? theme.colors.purpleDark : theme.backgrounds.dark};
   }
 `
 
 export const ModelSettingsButton = styled.button<{ isActive?: boolean }>`
   padding: 8px 12px;
-  background: ${({ theme, isActive }) => 
+  background: ${({ theme, isActive }) =>
     isActive ? theme.colors.purple : theme.backgrounds.lighter};
-  color: ${({ theme, isActive }) => 
-    isActive ? 'white' : theme.colors.white};
-  border: 1px solid ${({ theme, isActive }) => 
-    isActive ? theme.colors.purple : theme.backgrounds.lightest};
+  color: ${({ theme, isActive }) => (isActive ? 'white' : theme.colors.white)};
+  border: 1px solid
+    ${({ theme, isActive }) =>
+      isActive ? theme.colors.purple : theme.backgrounds.lightest};
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -134,19 +134,19 @@ export const ModelSettingsButton = styled.button<{ isActive?: boolean }>`
   min-height: 40px;
 
   &:hover {
-    background: ${({ theme, isActive }) => 
+    background: ${({ theme, isActive }) =>
       isActive ? theme.colors.purpleDark : theme.backgrounds.dark};
   }
 `
 
 export const TemplalizeButton = styled.button<{ isActive?: boolean }>`
   padding: 8px 12px;
-  background: ${({ theme, isActive }) => 
+  background: ${({ theme, isActive }) =>
     isActive ? theme.colors.purple : theme.backgrounds.lighter};
-  color: ${({ theme, isActive }) => 
-    isActive ? 'white' : theme.colors.white};
-  border: 1px solid ${({ theme, isActive }) => 
-    isActive ? theme.colors.purple : theme.backgrounds.lightest};
+  color: ${({ theme, isActive }) => (isActive ? 'white' : theme.colors.white)};
+  border: 1px solid
+    ${({ theme, isActive }) =>
+      isActive ? theme.colors.purple : theme.backgrounds.lightest};
   border-radius: 4px;
   font-size: 14px;
   font-weight: 500;
@@ -159,7 +159,7 @@ export const TemplalizeButton = styled.button<{ isActive?: boolean }>`
   min-height: 40px;
 
   &:hover {
-    background: ${({ theme, isActive }) => 
+    background: ${({ theme, isActive }) =>
       isActive ? theme.colors.purpleDark : theme.backgrounds.dark};
   }
 `
@@ -394,6 +394,7 @@ export const TestSection = styled.div`
   flex-direction: column;
   border-left: 1px solid ${({ theme }) => theme.backgrounds.lightest};
   padding-left: 20px;
+  min-height: 0;
 `
 
 export const Label = styled.label`
@@ -426,8 +427,6 @@ export const TextArea = styled.textarea`
   &::placeholder {
     color: ${({ theme }) => theme.colors.grey};
   }
-
-
 `
 
 export const VariableInput = styled.input`
@@ -506,7 +505,8 @@ export const TestButton = styled.button`
 
 export const ResponseArea = styled.textarea`
   width: 100%;
-  min-height: 200px;
+  flex: 1;
+  min-height: 400px;
   padding: 12px;
   background: ${({ theme }) => theme.backgrounds.lighter};
   border: 1px solid ${({ theme }) => theme.backgrounds.lightest};
@@ -547,10 +547,13 @@ export const TokenProgressBarTrack = styled.div`
   overflow: hidden;
 `
 
-export const TokenProgressBarFill = styled.div<{ percentage: number; isWarning: boolean }>`
+export const TokenProgressBarFill = styled.div<{
+  percentage: number
+  isWarning: boolean
+}>`
   width: ${({ percentage }) => Math.min(percentage, 100)}%;
   height: 100%;
-  background-color: ${({ theme, isWarning }) => 
+  background-color: ${({ theme, isWarning }) =>
     isWarning ? theme.colors.red : theme.colors.green};
   transition: width 0.3s ease;
 `
@@ -563,7 +566,7 @@ export const TokenCounter = styled.span<{ isWarning: boolean }>`
   background: ${({ theme }) => theme.backgrounds.lighter};
   border-radius: 4px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  color: ${({ theme, isWarning }) => 
+  color: ${({ theme, isWarning }) =>
     isWarning ? theme.colors.red : theme.colors.grey};
   cursor: help;
   font-size: 11px;
@@ -606,7 +609,7 @@ export const MessageHeader = styled.div`
 export const MessageType = styled.span<{ isAssistant?: boolean }>`
   font-size: 12px;
   font-weight: 500;
-  color: ${({ theme, isAssistant }) => 
+  color: ${({ theme, isAssistant }) =>
     isAssistant ? theme.colors.purple : theme.colors.white};
   display: flex;
   align-items: center;
@@ -635,7 +638,7 @@ export const RemoveMessageButton = styled.button`
 export const MessageContent = styled.div`
   padding: 12px;
   background: ${({ theme }) => theme.backgrounds.dark};
-` 
+`
 
 export const Loading = styled.div`
   height: 100%;
@@ -660,4 +663,4 @@ export const Spinner = styled.div`
   border-top: 3px solid transparent;
   border-radius: 50%;
   animation: ${spin} 1s linear infinite;
-` 
+`

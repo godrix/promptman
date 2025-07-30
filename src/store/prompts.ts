@@ -100,4 +100,4 @@ export const promptsState = atom<Prompt[]>({
 export const selectedPromptState = atom<Prompt | null>({
   key: 'selectedPromptState',
   default: null
-}) 
+})

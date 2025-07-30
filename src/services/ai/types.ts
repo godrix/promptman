@@ -61,4 +61,4 @@ export interface AIProviderSettings {
   stopSequences?: string[]
   seed?: number
   apiKeys: Record<string, string>
-} 
+}

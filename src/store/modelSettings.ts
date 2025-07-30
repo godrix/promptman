@@ -1,12 +1,10 @@
 import { atom } from 'recoil'
 import Store from 'electron-store'
 import { JSONSchemaType } from 'json-schema-typed'
-import { 
-  getDefaultProvider, 
-  getDefaultModel, 
+import {
+  getDefaultProvider,
+  getDefaultModel,
   defaultSettings,
-  getProvider,
-  getModel,
   providers
 } from '../config'
 
@@ -103,7 +101,9 @@ const modelSettingsStore = new Store({
 // Função para carregar configurações salvas
 export const loadModelSettings = (): ModelSettings => {
   try {
-    const savedSettings = modelSettingsStore.get('modelSettings') as ModelSettings
+    const savedSettings = modelSettingsStore.get(
+      'modelSettings'
+    ) as ModelSettings
     return savedSettings || defaultModelSettings
   } catch (error) {
     console.warn('Error loading model settings:', error)
@@ -165,7 +165,9 @@ export const getCurrentApiKey = (settings: ModelSettings): string => {
 // Função para definir a chave de API de um provider específico
 export const setProviderApiKey = (providerId: string, apiKey: string): void => {
   try {
-    const currentSettings = modelSettingsStore.get('modelSettings') as ModelSettings
+    const currentSettings = modelSettingsStore.get(
+      'modelSettings'
+    ) as ModelSettings
     const updatedSettings = {
       ...currentSettings,
       apiKeys: {
@@ -182,10 +184,12 @@ export const setProviderApiKey = (providerId: string, apiKey: string): void => {
 // Função para obter a chave de API de um provider específico
 export const getProviderApiKey = (providerId: string): string => {
   try {
-    const currentSettings = modelSettingsStore.get('modelSettings') as ModelSettings
+    const currentSettings = modelSettingsStore.get(
+      'modelSettings'
+    ) as ModelSettings
     return currentSettings.apiKeys[providerId] || ''
   } catch (error) {
     console.warn('Error getting provider API key:', error)
     return ''
   }
-} 
+}

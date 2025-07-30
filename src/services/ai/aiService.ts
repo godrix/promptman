@@ -29,9 +29,20 @@ const normalizeUsageData = (usage: any, provider: string) => {
     default:
       // Fallback: tentar mapear campos comuns
       return {
-        promptTokens: usage.promptTokens || usage.prompt_tokens || usage.input_tokens || usage.promptTokenCount || 0,
-        completionTokens: usage.completionTokens || usage.completion_tokens || usage.output_tokens || usage.candidatesTokenCount || 0,
-        totalTokens: usage.totalTokens || usage.total_tokens || usage.totalTokenCount || 0
+        promptTokens:
+          usage.promptTokens ||
+          usage.prompt_tokens ||
+          usage.input_tokens ||
+          usage.promptTokenCount ||
+          0,
+        completionTokens:
+          usage.completionTokens ||
+          usage.completion_tokens ||
+          usage.output_tokens ||
+          usage.candidatesTokenCount ||
+          0,
+        totalTokens:
+          usage.totalTokens || usage.total_tokens || usage.totalTokenCount || 0
       }
   }
 }
@@ -94,7 +105,9 @@ export class AIService {
       }
 
       // Construir o prompt completo para providers que não suportam system prompt separado
-      const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${processedPrompt}` : processedPrompt
+      const fullPrompt = systemPrompt
+        ? `${systemPrompt}\n\n${processedPrompt}`
+        : processedPrompt
 
       // Construir a URL da requisição
       const url = provider.requestFormat.endpoint
@@ -109,7 +122,7 @@ export class AIService {
 
       // Construir o body da requisição
       const body = JSON.parse(JSON.stringify(provider.requestFormat.body))
-      
+
       // Substituir placeholders no body
       const replaceInObject = (obj: any): any => {
         if (typeof obj === 'string') {
@@ -129,19 +142,40 @@ export class AIService {
               // Se o valor é uma string que contém placeholders numéricos, substituir diretamente
               if (typeof value === 'string' && value.includes('{maxTokens}')) {
                 newObj[key] = settings.maxTokens
-              } else if (typeof value === 'string' && value.includes('{temperature}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{temperature}')
+              ) {
                 newObj[key] = settings.temperature
-              } else if (typeof value === 'string' && value.includes('{topP}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{topP}')
+              ) {
                 newObj[key] = settings.topP
-              } else if (typeof value === 'string' && value.includes('{frequencyPenalty}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{frequencyPenalty}')
+              ) {
                 newObj[key] = settings.frequencyPenalty
-              } else if (typeof value === 'string' && value.includes('{presencePenalty}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{presencePenalty}')
+              ) {
                 newObj[key] = settings.presencePenalty
-              } else if (typeof value === 'string' && value.includes('{topK}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{topK}')
+              ) {
                 newObj[key] = settings.topK || 1
-              } else if (typeof value === 'string' && value.includes('{seed}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{seed}')
+              ) {
                 newObj[key] = settings.seed
-              } else if (typeof value === 'string' && value.includes('{stopSequences}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{stopSequences}')
+              ) {
                 newObj[key] = settings.stopSequences || null
               } else {
                 newObj[key] = replaceInObject(value)
@@ -152,7 +186,7 @@ export class AIService {
         }
         return obj
       }
-      
+
       const processedBody = replaceInObject(body)
 
       console.log('AI Request:', {
@@ -172,12 +206,14 @@ export class AIService {
         const errorData = await response.json().catch(() => ({}))
         return {
           content: '',
-          error: errorData.error?.message || `Erro HTTP ${response.status}: ${response.statusText}`
+          error:
+            errorData.error?.message ||
+            `Erro HTTP ${response.status}: ${response.statusText}`
         }
       }
 
       const responseData = await response.json()
-      
+
       // Parsear a resposta usando os caminhos configurados
       const getValueByPath = (obj: any, path: string) => {
         return path.split('.').reduce((current, key) => {
@@ -189,39 +225,50 @@ export class AIService {
           return current?.[key]
         }, obj)
       }
-      
-      const content = getValueByPath(responseData, provider.responseFormat.contentPath) || ''
-      const usage = provider.responseFormat.usagePath ? getValueByPath(responseData, provider.responseFormat.usagePath) : undefined
-      const error = provider.responseFormat.errorPath ? getValueByPath(responseData, provider.responseFormat.errorPath) : undefined
-      
+
+      const content =
+        getValueByPath(responseData, provider.responseFormat.contentPath) || ''
+      const usage = provider.responseFormat.usagePath
+        ? getValueByPath(responseData, provider.responseFormat.usagePath)
+        : undefined
+      const error = provider.responseFormat.errorPath
+        ? getValueByPath(responseData, provider.responseFormat.errorPath)
+        : undefined
+
       // Normalizar dados de uso para formato padrão
-      const normalizedUsage = usage ? normalizeUsageData(usage, settings.provider) : undefined
-      
+      const normalizedUsage = usage
+        ? normalizeUsageData(usage, settings.provider)
+        : undefined
+
       if (error) {
         return {
           content: '',
           error: error
         }
       }
-      
+
       const parsed: AIResponse = {
         content,
         usage: normalizedUsage
       }
-      
-      return { ...parsed, raw: responseData }
 
+      return { ...parsed, raw: responseData }
     } catch (error) {
       console.error('Erro na requisição de IA:', error)
       return {
         content: '',
-        error: error instanceof Error ? error.message : 'Erro desconhecido na requisição'
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Erro desconhecido na requisição'
       }
     }
   }
 
   // Método para testar a conectividade com um provider
-  async testConnection(settings: AIProviderSettings): Promise<{ success: boolean; error?: string }> {
+  async testConnection(
+    settings: AIProviderSettings
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const provider = getProvider(settings.provider)
       if (!provider) {
@@ -262,7 +309,7 @@ export class AIService {
 
       // Construir um body simples para teste
       const testBody = JSON.parse(JSON.stringify(provider.requestFormat.body))
-      
+
       // Substituir placeholders no body
       const replaceInObject = (obj: any): any => {
         if (typeof obj === 'string') {
@@ -281,7 +328,10 @@ export class AIService {
               // Se o valor é uma string que contém placeholders numéricos, substituir diretamente
               if (typeof value === 'string' && value.includes('{maxTokens}')) {
                 newObj[key] = 10
-              } else if (typeof value === 'string' && value.includes('{temperature}')) {
+              } else if (
+                typeof value === 'string' &&
+                value.includes('{temperature}')
+              ) {
                 newObj[key] = 0.1
               } else {
                 newObj[key] = replaceInObject(value)
@@ -292,7 +342,7 @@ export class AIService {
         }
         return obj
       }
-      
+
       const processedBody = replaceInObject(testBody)
 
       const response = await fetch(`${provider.baseUrl}${url}`, {
@@ -310,7 +360,6 @@ export class AIService {
       }
 
       return { success: true }
-
     } catch (error) {
       return {
         success: false,
@@ -320,4 +369,4 @@ export class AIService {
   }
 }
 
-export const aiService = AIService.getInstance() 
+export const aiService = AIService.getInstance()

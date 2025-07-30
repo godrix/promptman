@@ -46,12 +46,12 @@ export const PromptItem = styled.div<{ isSelected?: boolean }>`
   padding: 12px 16px;
   cursor: pointer;
   border-bottom: 1px solid ${({ theme }) => theme.backgrounds.lightest};
-  background: ${({ theme, isSelected }) => 
+  background: ${({ theme, isSelected }) =>
     isSelected ? theme.backgrounds.lightest : 'transparent'};
   position: relative;
 
   &:hover {
-    background: ${({ theme, isSelected }) => 
+    background: ${({ theme, isSelected }) =>
       isSelected ? theme.backgrounds.lightest : theme.backgrounds.dark};
   }
 `
@@ -72,7 +72,7 @@ export const PromptActions = styled.div`
   gap: 4px;
   opacity: 0;
   transition: opacity 0.2s;
-  
+
   ${PromptItem}:hover & {
     opacity: 1;
   }
@@ -120,9 +120,10 @@ export const UnsavedIndicator = styled.span`
   display: flex;
   align-items: center;
   animation: pulse 2s infinite;
-  
+
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
     }
     50% {
@@ -135,4 +136,4 @@ export const PromptDescription = styled.div`
   font-size: 12px;
   color: ${({ theme }) => theme.colors.grey};
   line-height: 1.4;
-` 
+`

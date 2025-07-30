@@ -3,8 +3,8 @@ import { geminiProvider } from './gemini'
 import { openaiProvider } from './openai'
 
 export const providers: Record<string, AIProvider> = {
-  'Gemini': geminiProvider,
-  'OpenAI': openaiProvider
+  Gemini: geminiProvider,
+  OpenAI: openaiProvider
 }
 
 export const getProvider = (name: string): AIProvider | undefined => {
@@ -23,4 +23,4 @@ export const getProviderModels = (providerName: string) => {
 // Função para adicionar novos providers dinamicamente
 export const registerProvider = (provider: AIProvider) => {
   providers[provider.name] = provider
-} 
+}
