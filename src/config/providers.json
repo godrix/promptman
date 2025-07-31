@@ -12,7 +12,24 @@
           "displayName": "GPT-4o",
           "maxTokens": 128000,
           "defaultTemperature": 0.7,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 33554432,
+            "allowedTypes": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "processing": {
+              "method": "base64",
+              "format": "input_file",
+              "contextTemplate": "Este prompt inclui um arquivo que deve ser analisado: {fileName} ({fileSize} MB)"
+            }
+          }
         },
         {
           "id": "gpt-4o-mini",
@@ -20,7 +37,24 @@
           "displayName": "GPT-4o Mini",
           "maxTokens": 128000,
           "defaultTemperature": 0.7,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 33554432,
+            "allowedTypes": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "processing": {
+              "method": "base64",
+              "format": "input_file",
+              "contextTemplate": "Este prompt inclui um arquivo que deve ser analisado: {fileName} ({fileSize} MB)"
+            }
+          }
         },
         {
           "id": "gpt-4-turbo",
@@ -28,7 +62,24 @@
           "displayName": "GPT-4 Turbo",
           "maxTokens": 128000,
           "defaultTemperature": 0.7,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 33554432,
+            "allowedTypes": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "processing": {
+              "method": "base64",
+              "format": "input_file",
+              "contextTemplate": "Este prompt inclui um arquivo que deve ser analisado: {fileName} ({fileSize} MB)"
+            }
+          }
         },
         {
           "id": "gpt-3.5-turbo",
@@ -36,7 +87,8 @@
           "displayName": "GPT-3.5 Turbo",
           "maxTokens": 16385,
           "defaultTemperature": 0.7,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": false
         }
       ],
       "headers": {
@@ -45,32 +97,41 @@
       },
       "requestFormat": {
         "method": "POST",
-        "endpoint": "/chat/completions",
+        "endpoint": "/responses",
         "body": {
           "model": "{model}",
-          "messages": [
-            {
-              "role": "system",
-              "content": "{systemPrompt}"
-            },
+          "input": [
             {
               "role": "user",
-              "content": "{userPrompt}"
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "{fullPrompt}"
+                }
+              ]
             }
-          ],
-          "temperature": "{temperature}",
-          "max_tokens": "{maxTokens}",
-          "top_p": "{topP}",
-          "frequency_penalty": "{frequencyPenalty}",
-          "presence_penalty": "{presencePenalty}",
-          "stop": "{stopSequences}",
-          "seed": "{seed}"
+          ]
+        },
+        "fileProcessing": {
+          "enabled": true,
+          "strategy": "responses_api",
+          "contentStructure": [
+            {
+              "type": "input_file",
+              "filename": "{fileName}",
+              "file_data": "data:{fileType};base64,{fileData}"
+            },
+            {
+              "type": "input_text",
+              "text": "{userPrompt}"
+            }
+          ]
         }
       },
       "responseFormat": {
-        "contentPath": "choices[0].message.content",
+        "contentPath": "output[0].content[0].text",
         "usagePath": "usage",
-        "errorPath": "error.message"
+        "errorPath": "error"
       }
     },
     {
@@ -85,7 +146,18 @@
           "displayName": "Gemini 2.5 Pro",
           "maxTokens": 1048576,
           "defaultTemperature": 1,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 20971520,
+            "allowedTypes": ["application/pdf"],
+            "processing": {
+              "method": "context",
+              "format": "text",
+              "contextTemplate": "\n\n[CONTEXTO DO DOCUMENTO: {fileName} - {fileSize} MB]\nEste prompt inclui um documento PDF que deve ser analisado e interpretado pelo modelo.\nO documento pode conter texto, imagens, diagramas, gráficos e tabelas.\nPor favor, analise todo o conteúdo do documento e responda com base nas informações contidas nele."
+            }
+          }
         },
         {
           "id": "gemini-2.5-flash",
@@ -93,7 +165,18 @@
           "displayName": "Gemini 2.5 Flash",
           "maxTokens": 1048576,
           "defaultTemperature": 1,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 20971520,
+            "allowedTypes": ["application/pdf"],
+            "processing": {
+              "method": "context",
+              "format": "text",
+              "contextTemplate": "\n\n[CONTEXTO DO DOCUMENTO: {fileName} - {fileSize} MB]\nEste prompt inclui um documento PDF que deve ser analisado e interpretado pelo modelo.\nO documento pode conter texto, imagens, diagramas, gráficos e tabelas.\nPor favor, analise todo o conteúdo do documento e responda com base nas informações contidas nele."
+            }
+          }
         },
         {
           "id": "gemini-2.5-flash-lite",
@@ -101,7 +184,8 @@
           "displayName": "Gemini 2.5 Flash Lite",
           "maxTokens": 1048576,
           "defaultTemperature": 1,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": false
         },
         {
           "id": "gemini-2.0-flash",
@@ -109,7 +193,8 @@
           "displayName": "Gemini 2.0 Flash",
           "maxTokens": 1048576,
           "defaultTemperature": 1,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": false
         },
         {
           "id": "gemini-2.0-flash-lite",
@@ -117,7 +202,8 @@
           "displayName": "Gemini 2.0 Flash Lite",
           "maxTokens": 1048576,
           "defaultTemperature": 1,
-          "defaultMaxTokens": 4096
+          "defaultMaxTokens": 4096,
+          "supportsVision": false
         }
       ],
       "headers": {
@@ -152,6 +238,108 @@
         "usagePath": "usageMetadata",
         "errorPath": "error.message"
       }
+    },
+    {
+      "id": "anthropic",
+      "name": "Anthropic",
+      "displayName": "Anthropic Claude",
+      "baseUrl": "https://api.anthropic.com/v1",
+      "models": [
+        {
+          "id": "claude-3-5-sonnet",
+          "name": "claude-3-5-sonnet-20241022",
+          "displayName": "Claude 3.5 Sonnet",
+          "maxTokens": 200000,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 20971520,
+            "allowedTypes": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "processing": {
+              "method": "base64",
+              "format": "image",
+              "contextTemplate": "Este prompt inclui um arquivo que deve ser analisado: {fileName} ({fileSize} MB)"
+            }
+          }
+        },
+        {
+          "id": "claude-3-opus",
+          "name": "claude-3-opus-20240229",
+          "displayName": "Claude 3 Opus",
+          "maxTokens": 200000,
+          "defaultTemperature": 0.7,
+          "defaultMaxTokens": 4096,
+          "supportsVision": true,
+          "fileSupport": {
+            "enabled": true,
+            "maxSize": 20971520,
+            "allowedTypes": [
+              "application/pdf",
+              "image/jpeg",
+              "image/png",
+              "image/gif",
+              "image/webp"
+            ],
+            "processing": {
+              "method": "base64",
+              "format": "image",
+              "contextTemplate": "Este prompt inclui um arquivo que deve ser analisado: {fileName} ({fileSize} MB)"
+            }
+          }
+        }
+      ],
+      "headers": {
+        "Content-Type": "application/json",
+        "x-api-key": "{apiKey}",
+        "anthropic-version": "2023-06-01"
+      },
+      "requestFormat": {
+        "method": "POST",
+        "endpoint": "/messages",
+        "body": {
+          "model": "{model}",
+          "max_tokens": "{maxTokens}",
+          "temperature": "{temperature}",
+          "system": "{systemPrompt}",
+          "messages": [
+            {
+              "role": "user",
+              "content": "{content}"
+            }
+          ]
+        },
+        "fileProcessing": {
+          "enabled": true,
+          "strategy": "multimodal",
+          "contentStructure": [
+            {
+              "type": "image",
+              "source": {
+                "type": "base64",
+                "media_type": "{fileType}",
+                "data": "{fileData}"
+              }
+            },
+            {
+              "type": "text",
+              "text": "{userPrompt}"
+            }
+          ]
+        }
+      },
+      "responseFormat": {
+        "contentPath": "content[0].text",
+        "usagePath": "usage",
+        "errorPath": "error.message"
+      }
     }
   ],
   "defaultProvider": "openai",
@@ -165,5 +353,32 @@
     "topK": 1,
     "stopSequences": [],
     "seed": null
+  },
+  "fileProcessing": {
+    "globalSettings": {
+      "maxFileSize": 20971520,
+      "allowedFileTypes": [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp"
+      ],
+      "defaultProcessingMethod": "context"
+    },
+    "strategies": {
+      "context": {
+        "description": "Adiciona contexto textual sobre o arquivo ao prompt",
+        "supportedProviders": ["gemini"]
+      },
+      "base64": {
+        "description": "Converte arquivo para base64 e envia como dados binários",
+        "supportedProviders": ["openai", "anthropic"]
+      },
+      "multimodal": {
+        "description": "Estrutura multimodal com texto e arquivo separados",
+        "supportedProviders": ["openai", "anthropic"]
+      }
+    }
   }
 }

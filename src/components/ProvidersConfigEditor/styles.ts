@@ -1,13 +1,21 @@
 import styled from 'styled-components'
 
 export const Container = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 95vw;
+  max-width: 1200px;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   padding: 32px;
   background: ${({ theme }) => theme.backgrounds.dark};
+  border: 1px solid ${({ theme }) => theme.backgrounds.lightest};
+  border-radius: 8px;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 `
 
 export const Button = styled.button`

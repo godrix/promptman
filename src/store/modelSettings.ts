@@ -140,8 +140,11 @@ export const getAvailableModelsForProvider = (providerName: string) => {
     return []
   }
   return provider.models.map(model => ({
+    id: model.id,
     value: model.id,
-    label: model.displayName
+    label: model.displayName,
+    displayName: model.displayName,
+    supportsVision: model.supportsVision || false
   }))
 }
 

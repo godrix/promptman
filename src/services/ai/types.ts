@@ -11,6 +11,16 @@ export interface AIModel {
   displayName: string
   maxTokens: number
   supportsVision?: boolean
+  fileSupport?: {
+    enabled: boolean
+    maxSize: number
+    allowedTypes: string[]
+    processing: {
+      method: 'context' | 'base64'
+      format: string
+      contextTemplate: string
+    }
+  }
 }
 
 export interface AIProviderConfig {
@@ -28,6 +38,7 @@ export interface AIRequestParams {
   maxTokens: number
   apiKey: string
   variables?: Record<string, string>
+  attachedFile?: File | null
 }
 
 export interface AIRequest {
@@ -61,4 +72,22 @@ export interface AIProviderSettings {
   stopSequences?: string[]
   seed?: number
   apiKeys: Record<string, string>
+}
+
+// Tipos para configuração dinâmica via JSON
+export interface RequestFormat {
+  method: string
+  endpoint: string
+  body: any
+  fileProcessing?: {
+    enabled: boolean
+    strategy: 'multimodal' | 'responses_api'
+    contentStructure: any[]
+  }
+}
+
+export interface ResponseFormat {
+  contentPath: string
+  usagePath?: string
+  errorPath?: string
 }

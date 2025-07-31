@@ -27,7 +27,9 @@ import {
   FiSquare,
   FiCircle,
   FiMinus,
-  FiCpu
+  FiCpu,
+  FiFile,
+  FiPaperclip
 } from 'react-icons/fi'
 
 import {
@@ -48,6 +50,7 @@ import {
 import Modal from '../../components/Modal'
 import ProvidersConfigEditor from '../../components/ProvidersConfigEditor'
 import SettingsMenu from '../../components/SettingsMenu'
+import JsonViewer from '../../components/JsonViewer'
 import { t } from '../../strings'
 
 interface Message {
@@ -142,6 +145,7 @@ const PromptEditor: React.FC = () => {
     selectedPrompt?.userPrompt || ''
   )
   const [showRawResponse, setShowRawResponse] = useState(false)
+  const [attachedFile, setAttachedFile] = useState<File | null>(null)
 
   // Frases engraçadas para mostrar durante o loading
   const loadingPhrases = [
@@ -270,6 +274,14 @@ const PromptEditor: React.FC = () => {
       })
       return next
     })
+
+    // Limpar arquivo anexado APENAS ao trocar de prompt (não ao editar)
+    // Vamos usar uma ref para controlar se é uma mudança de prompt ou edição
+    const isPromptChange = selectedPrompt.id !== (window as any).__lastPromptId
+    if (isPromptChange) {
+      setAttachedFile(null)
+      ;(window as any).__lastPromptId = selectedPrompt.id
+    }
   }, [selectedPrompt])
 
   // Função para atualizar a contagem de tokens
@@ -311,6 +323,66 @@ const PromptEditor: React.FC = () => {
     setMessages(prev =>
       prev.map(msg => (msg.id === messageId ? { ...msg, content } : msg))
     )
+  }
+
+  // Função para lidar com a seleção de arquivo
+  const handleFileSelect = (file: File) => {
+    try {
+      console.log('PromptEditor: Processando arquivo anexado:', file.name)
+
+      // Validações adicionais
+      if (!file) {
+        console.error('Arquivo é null ou undefined')
+        return
+      }
+
+      if (file.type !== 'application/pdf') {
+        addToast({
+          type: 'error',
+          title: 'Tipo de arquivo não suportado',
+          description: 'Apenas arquivos PDF são suportados.'
+        })
+        return
+      }
+
+      // Validar tamanho do arquivo (máximo 20MB conforme API Gemini)
+      const maxSize = 20 * 1024 * 1024 // 20MB
+      if (file.size > maxSize) {
+        addToast({
+          type: 'error',
+          title: 'Arquivo muito grande',
+          description:
+            'O arquivo PDF deve ter no máximo 20MB conforme especificação da API Gemini.'
+        })
+        return
+      }
+
+      setAttachedFile(file)
+      addToast({
+        type: 'success',
+        title: 'Arquivo anexado',
+        description: `PDF "${file.name}" foi anexado com sucesso.`
+      })
+
+      console.log('PromptEditor: Arquivo anexado com sucesso')
+    } catch (error) {
+      console.error('PromptEditor: Erro ao processar arquivo:', error)
+      addToast({
+        type: 'error',
+        title: 'Erro ao anexar arquivo',
+        description: 'Ocorreu um erro ao processar o arquivo. Tente novamente.'
+      })
+    }
+  }
+
+  // Função para remover o arquivo anexado
+  const handleFileRemove = () => {
+    setAttachedFile(null)
+    addToast({
+      type: 'info',
+      title: 'Arquivo removido',
+      description: 'O arquivo PDF foi removido do prompt.'
+    })
   }
 
   // Atualizar contagem de tokens quando o prompt selecionado ou mensagens mudarem
@@ -426,6 +498,9 @@ const PromptEditor: React.FC = () => {
     setSaveStatus('saved')
     setTimeout(() => setSaveStatus('idle'), 2000)
     console.log('Prompt salvo via Ctrl+S:', updatedPrompt)
+
+    // Limpar arquivo anexado após salvar
+    setAttachedFile(null)
   }
 
   const handleVariableChange = (variable: string, value: string) => {
@@ -1026,6 +1101,24 @@ const PromptEditor: React.FC = () => {
       return
     }
 
+    // Validação: Verificar se o modelo suporta arquivos quando há um arquivo anexado
+    if (attachedFile) {
+      const currentModel = getAvailableModelsForProvider(
+        modelSettings.provider
+      ).find(m => m.id === modelSettings.model)
+
+      if (!currentModel?.supportsVision) {
+        addToast({
+          type: 'error',
+          title: 'Modelo não suporta arquivos',
+          description: `O modelo '${
+            currentModel?.displayName || modelSettings.model
+          }' não suporta arquivos anexados. Use um modelo que suporte visão.`
+        })
+        return
+      }
+    }
+
     setIsLoading(true)
 
     // Selecionar uma frase aleatória para começar
@@ -1036,7 +1129,8 @@ const PromptEditor: React.FC = () => {
         selectedPrompt.userPrompt,
         selectedPrompt.systemPrompt,
         modelSettings,
-        testVariables
+        testVariables,
+        attachedFile
       )
 
       if (result.error) {
@@ -1758,44 +1852,113 @@ const PromptEditor: React.FC = () => {
           <AccordionSection>
             <AccordionHeader style={{ cursor: 'default' }}>
               <div
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%'
+                }}
               >
-                <Label style={{ margin: 0 }}>User Prompt</Label>
-                <button
-                  type="button"
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                  title="Expandir para tela cheia"
-                  onClick={() => {
-                    setModalPromptValue(selectedPrompt?.userPrompt || '')
-                    setPromptModalOpen(true)
-                  }}
-                  onMouseOver={e => {
-                    const icon = e.currentTarget
-                      .firstChild as HTMLElement | null
-                    if (icon && 'style' in icon) {
-                      ;(icon as HTMLElement).style.color = '#8257e6'
-                    }
-                  }}
-                  onMouseOut={e => {
-                    const icon = e.currentTarget
-                      .firstChild as HTMLElement | null
-                    if (icon && 'style' in icon) {
-                      ;(icon as HTMLElement).style.color = '#E1E1E6'
-                    }
-                  }}
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
-                  <FiMaximize2
-                    size={18}
-                    style={{ color: '#E1E1E6', transition: 'color 0.2s' }}
-                  />
-                </button>
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                    title="Expandir para tela cheia"
+                    onClick={() => {
+                      setModalPromptValue(selectedPrompt?.userPrompt || '')
+                      setPromptModalOpen(true)
+                    }}
+                    onMouseOver={e => {
+                      const icon = e.currentTarget
+                        .firstChild as HTMLElement | null
+                      if (icon && 'style' in icon) {
+                        ;(icon as HTMLElement).style.color = '#8257e6'
+                      }
+                    }}
+                    onMouseOut={e => {
+                      const icon = e.currentTarget
+                        .firstChild as HTMLElement | null
+                      if (icon && 'style' in icon) {
+                        ;(icon as HTMLElement).style.color = '#E1E1E6'
+                      }
+                    }}
+                  >
+                    <FiMaximize2
+                      size={18}
+                      style={{ color: '#E1E1E6', transition: 'color 0.2s' }}
+                    />
+                  </button>
+                  <Label style={{ margin: 0 }}>User Prompt</Label>
+                </div>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                >
+                  {attachedFile && (
+                    <span
+                      style={{
+                        fontSize: '10px',
+                        color: '#67e480',
+                        backgroundColor: 'rgba(103, 228, 128, 0.1)',
+                        padding: '2px 6px',
+                        borderRadius: '3px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                      title={`PDF anexado: ${attachedFile.name}`}
+                    >
+                      <FiFile size={12} />
+                      PDF
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: '4px',
+                      transition: 'all 0.2s'
+                    }}
+                    title="Anexar PDF"
+                    onClick={() => {
+                      const input = document.createElement('input')
+                      input.type = 'file'
+                      input.accept = '.pdf'
+                      input.onchange = e => {
+                        const file = (e.target as HTMLInputElement).files?.[0]
+                        if (file) {
+                          handleFileSelect(file)
+                        }
+                      }
+                      input.click()
+                    }}
+                    onMouseOver={e => {
+                      e.currentTarget.style.background =
+                        'rgba(130, 87, 230, 0.1)'
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = 'transparent'
+                    }}
+                  >
+                    <FiPaperclip
+                      size={16}
+                      style={{ color: '#E1E1E6', transition: 'color 0.2s' }}
+                    />
+                  </button>
+                </div>
               </div>
             </AccordionHeader>
 
@@ -1985,24 +2148,48 @@ const PromptEditor: React.FC = () => {
               justifyContent: 'space-between'
             }}
           >
-            {/* Indicador do modelo */}
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: '#222',
-                color: '#fff',
-                borderRadius: 4,
-                padding: '4px 12px',
-                fontWeight: 500,
-                fontSize: 13,
-                opacity: 0.8
-              }}
-              title={`Modelo atual: ${modelSettings.provider} - ${modelSettings.model}`}
-            >
-              <FiCpu size={14} style={{ marginRight: 6 }} />
-              {modelSettings.model}
-            </span>
+            {/* Indicadores do modelo e arquivo anexado */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Indicador do modelo */}
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: '#222',
+                  color: '#fff',
+                  borderRadius: 4,
+                  padding: '4px 12px',
+                  fontWeight: 500,
+                  fontSize: 13,
+                  opacity: 0.8
+                }}
+                title={`Modelo atual: ${modelSettings.provider} - ${modelSettings.model}`}
+              >
+                <FiCpu size={14} style={{ marginRight: 6 }} />
+                {modelSettings.model}
+              </span>
+
+              {/* Indicador de arquivo anexado */}
+              {attachedFile && (
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: '#67e480',
+                    color: '#000',
+                    borderRadius: 4,
+                    padding: '4px 12px',
+                    fontWeight: 500,
+                    fontSize: 13,
+                    opacity: 0.9
+                  }}
+                  title={`Arquivo anexado: ${attachedFile.name}`}
+                >
+                  <FiFile size={14} style={{ marginRight: 6 }} />
+                  PDF
+                </span>
+              )}
+            </div>
 
             {/* Botões de resposta */}
             <div
@@ -2176,29 +2363,56 @@ const PromptEditor: React.FC = () => {
                 </div>
               )}
               {showRawResponse ? (
-                <ResponseArea
-                  value={(() => {
-                    if (
-                      typeof currentResponseObj === 'object' &&
-                      currentResponseObj !== null &&
-                      'raw' in currentResponseObj
-                    ) {
-                      return typeof currentResponseObj.raw === 'string'
-                        ? currentResponseObj.raw
-                        : JSON.stringify(currentResponseObj.raw, null, 2)
+                (() => {
+                  let jsonData = null
+                  if (
+                    typeof currentResponseObj === 'object' &&
+                    currentResponseObj !== null &&
+                    'raw' in currentResponseObj
+                  ) {
+                    jsonData =
+                      typeof currentResponseObj.raw === 'string'
+                        ? JSON.parse(currentResponseObj.raw)
+                        : currentResponseObj.raw
+                  } else if (typeof currentResponseObj === 'string') {
+                    try {
+                      jsonData = JSON.parse(currentResponseObj)
+                    } catch {
+                      jsonData = {
+                        error: 'JSON inválido',
+                        content: currentResponseObj
+                      }
                     }
-                    return typeof currentResponseObj === 'string'
-                      ? currentResponseObj
-                      : ''
-                  })()}
-                  readOnly
-                  style={{
-                    fontFamily: 'monospace',
-                    fontSize: 13,
-                    background: '#18181a',
-                    color: '#e1e1e6'
-                  }}
-                />
+                  }
+
+                  return jsonData ? (
+                    <JsonViewer
+                      data={jsonData}
+                      title="Resposta da API"
+                      showControls={true}
+                      collapsed={false}
+                      displayDataTypes={false}
+                      displayObjectSize={false}
+                      enableClipboard={true}
+                      style={{
+                        marginTop: 12,
+                        border: '1px solid #27272a',
+                        borderRadius: 8
+                      }}
+                    />
+                  ) : (
+                    <ResponseArea
+                      value="Nenhum dado JSON disponível"
+                      readOnly
+                      style={{
+                        fontFamily: 'monospace',
+                        fontSize: 13,
+                        background: '#18181a',
+                        color: '#e1e1e6'
+                      }}
+                    />
+                  )
+                })()
               ) : (
                 <ResponseArea value={responseText} readOnly />
               )}

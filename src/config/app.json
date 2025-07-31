@@ -3,8 +3,8 @@
     "name": "PromptMan",
     "version": "1.0.0",
     "description": "A beautiful Prompt Testing and Management Tool",
-    "author": "Diego Fernandes",
-    "repository": "https://github.com/diego3g/promptman"
+    "author": "Carlos Gabriel Godri",
+    "repository": "https://github.com/godrix/promptman"
   },
   "ui": {
     "theme": {

@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { FiCode, FiX, FiSave, FiRefreshCw } from 'react-icons/fi'
+import {
+  FiCode,
+  FiX,
+  FiSave,
+  FiRefreshCw,
+  FiEye,
+  FiEdit3
+} from 'react-icons/fi'
 import { useToast } from '../../context/toast'
 import { t } from '../../strings'
 import Modal from '../Modal'
+import JsonViewer from '../JsonViewer'
 import {
   Container,
   Button,
@@ -71,6 +79,7 @@ const ProvidersConfigEditor: React.FC<ProvidersConfigEditorProps> = ({
   const [originalConfig, setOriginalConfig] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showJsonViewer, setShowJsonViewer] = useState(true)
 
   // Carregar configuração atual
   const loadCurrentConfig = async () => {
@@ -219,6 +228,15 @@ const ProvidersConfigEditor: React.FC<ProvidersConfigEditorProps> = ({
     setError(null)
   }
 
+  // Obter dados JSON parseados
+  const getParsedConfig = () => {
+    try {
+      return JSON.parse(configText)
+    } catch {
+      return null
+    }
+  }
+
   // Verificar se houve mudanças
   const hasChanges = configText !== originalConfig
 
@@ -233,31 +251,7 @@ const ProvidersConfigEditor: React.FC<ProvidersConfigEditorProps> = ({
         </Button>
       )}
 
-      <Modal
-        visible={isModalOpen}
-        onRequestClose={handleCloseModal}
-        style={{
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000
-          },
-          content: {
-            width: '95vw',
-            maxWidth: '1200px',
-            height: '90vh',
-            background: '#191622',
-            border: '1px solid #322D41',
-            borderRadius: '8px',
-            boxShadow: '0px 6px 20px rgba(0, 0, 0, 0.3)',
-            overflow: 'hidden',
-            padding: 0,
-            inset: 'auto'
-          }
-        }}
-      >
+      <Modal visible={isModalOpen} onRequestClose={handleCloseModal}>
         <Container>
           <div
             style={{
@@ -291,28 +285,124 @@ const ProvidersConfigEditor: React.FC<ProvidersConfigEditorProps> = ({
           )}
 
           <div style={{ marginBottom: '24px' }}>
-            <p
+            <div
               style={{
-                color: '#E1E1E6',
-                fontSize: '14px',
-                margin: '0 0 16px 0',
-                opacity: 0.8
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
               }}
             >
-              {t('promptEditor.providersConfigDescription')}
-            </p>
+              <p
+                style={{
+                  color: '#E1E1E6',
+                  fontSize: '14px',
+                  margin: 0,
+                  opacity: 0.8
+                }}
+              >
+                Visualize e edite a configuração de providers. Use "Visualizar"
+                para navegar pela estrutura ou "Editar" para modificar o JSON.
+              </p>
+
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '8px',
+                  alignItems: 'center'
+                }}
+              >
+                <button
+                  onClick={() => setShowJsonViewer(true)}
+                  style={{
+                    background: showJsonViewer ? '#8257e6' : 'transparent',
+                    color: showJsonViewer ? '#fff' : '#8257e6',
+                    border: '1px solid #8257e6',
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  disabled={isLoading}
+                >
+                  <FiEye size={12} />
+                  Visualizar
+                </button>
+
+                <button
+                  onClick={() => setShowJsonViewer(false)}
+                  style={{
+                    background: !showJsonViewer ? '#8257e6' : 'transparent',
+                    color: !showJsonViewer ? '#fff' : '#8257e6',
+                    border: '1px solid #8257e6',
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                  disabled={isLoading}
+                >
+                  <FiEdit3 size={12} />
+                  Editar
+                </button>
+              </div>
+            </div>
           </div>
 
-          <TextArea
-            value={configText}
-            onChange={e => {
-              setConfigText(e.target.value)
-              setError(null)
-            }}
-            placeholder={t('promptEditor.providersConfigDescription')}
-            spellCheck={false}
-            disabled={isLoading}
-          />
+          {showJsonViewer ? (
+            getParsedConfig() ? (
+              <JsonViewer
+                data={getParsedConfig()}
+                title="Configuração de Providers"
+                showControls={true}
+                collapsed={false}
+                displayDataTypes={false}
+                displayObjectSize={false}
+                enableClipboard={true}
+                style={{
+                  height: '60vh',
+                  border: '1px solid #322D41',
+                  borderRadius: '8px'
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  background: '#18181a',
+                  border: '1px solid #ef4444',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  color: '#ef4444',
+                  textAlign: 'center',
+                  height: '60vh',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <p>JSON inválido. Use o editor para corrigir os erros.</p>
+              </div>
+            )
+          ) : (
+            <TextArea
+              value={configText}
+              onChange={e => {
+                setConfigText(e.target.value)
+                setError(null)
+              }}
+              placeholder={t('promptEditor.providersConfigDescription')}
+              spellCheck={false}
+              disabled={isLoading}
+            />
+          )}
 
           <ButtonGroup>
             <ResetButton
