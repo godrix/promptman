@@ -88,7 +88,7 @@
     "eslint-plugin-standard": "4.0.1",
     "html-webpack-plugin": "4.3.0",
     "jest": "26.1.0",
-    "json-schema-typed": "7.0.3",
+    "json-schema-typed": "8.0.1",
     "prettier": "2.0.5",
     "react-refresh": "0.8.3",
     "rimraf": "3.0.2",
